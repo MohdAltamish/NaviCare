@@ -16,8 +16,10 @@ export default function CustomCursor() {
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
-    setIsDesktop(mq.matches);
     const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    setTimeout(() => {
+      setIsDesktop(mq.matches);
+    }, 0);
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
   }, []);

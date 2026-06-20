@@ -77,8 +77,10 @@ export default function LandingPage() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    setIsMobile(window.innerWidth < 768);
     const handleResize = () => setIsMobile(window.innerWidth < 768);
+    setTimeout(() => {
+      setIsMobile(window.innerWidth < 768);
+    }, 0);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -89,25 +91,27 @@ export default function LandingPage() {
 
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-    tl.from(".hero-word", {
-      y: 60,
-      opacity: 0,
-      stagger: 0.06,
-      duration: 0.8,
-    })
-      .from(
+    tl.fromTo(
+      ".hero-word",
+      { y: 60, opacity: 0 },
+      { y: 0, opacity: 1, stagger: 0.06, duration: 0.8 }
+    )
+      .fromTo(
         ".hero-sub",
-        { y: 20, opacity: 0, duration: 0.6 },
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6 },
         "-=0.3"
       )
-      .from(
+      .fromTo(
         ".hero-input",
-        { y: 30, opacity: 0, duration: 0.5 },
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5 },
         "-=0.2"
       )
-      .from(
+      .fromTo(
         ".hero-btn",
-        { scale: 0.9, opacity: 0, duration: 0.4 },
+        { scale: 0.9, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.4 },
         "-=0.2"
       );
 

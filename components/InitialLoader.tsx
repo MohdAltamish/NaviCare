@@ -14,12 +14,17 @@ export default function InitialLoader() {
     // Only show on first visit
     const hasLoaded = sessionStorage.getItem("navicare_loaded");
     if (hasLoaded) {
-      setShow(false);
       return;
     }
 
-    setShow(true);
-    sessionStorage.setItem("navicare_loaded", "true");
+    setTimeout(() => {
+      setShow(true);
+      sessionStorage.setItem("navicare_loaded", "true");
+    }, 0);
+  }, []);
+
+  useEffect(() => {
+    if (!show) return;
 
     // Animate letters
     const tl = gsap.timeline({
@@ -29,14 +34,18 @@ export default function InitialLoader() {
       },
     });
 
-    tl.from(lettersRef.current, {
-      opacity: 0,
-      y: 20,
-      stagger: 0.06,
-      duration: 0.4,
-      ease: "power3.out",
-      delay: 0.2,
-    });
+    tl.fromTo(
+      lettersRef.current,
+      { opacity: 0, y: 20 },
+      {
+        opacity: 1,
+        y: 0,
+        stagger: 0.06,
+        duration: 0.4,
+        ease: "power3.out",
+        delay: 0.2,
+      }
+    );
 
     if (lineRef.current) {
       tl.fromTo(
@@ -48,7 +57,7 @@ export default function InitialLoader() {
     }
 
     tl.to({}, { duration: 0.3 }); // Brief pause before fade out
-  }, []);
+  }, [show]);
 
   if (!show) return null;
 
