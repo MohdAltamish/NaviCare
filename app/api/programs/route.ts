@@ -7,6 +7,28 @@ if (process.env.GEMINI_API_KEY && process.env.GOOGLE_API_KEY) {
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
+async function generateContentWithRetry(params: any, retries = 3, delayMs = 2000): Promise<any> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await ai.models.generateContent(params);
+    } catch (error: any) {
+      const errStr = error instanceof Error ? error.message : String(error);
+      const isQuota = errStr.toLowerCase().includes("quota") || 
+                      errStr.includes("429") || 
+                      errStr.toLowerCase().includes("limit") || 
+                      errStr.toLowerCase().includes("exhausted");
+      
+      if (isQuota && attempt < retries) {
+        console.warn(`[Gemini API] Rate limit hit. Retrying attempt ${attempt}/${retries} after ${delayMs}ms...`);
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        delayMs = delayMs * 1.5;
+        continue;
+      }
+      throw error;
+    }
+  }
+}
+
 const SYSTEM_PROMPT = `You are NaviCare, a US government benefits navigator.
 
 You will receive a person's summary information. Your job is to reason carefully
@@ -138,8 +160,8 @@ ${category_filter ? `\nCategory filter: Focus on "${category_filter}" programs.`
 
 Please analyze which benefit programs this person may qualify for and which they likely do not.`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash",
+    const response = await generateContentWithRetry({
+      model: "gemini-2.5-flash",
       contents: userMessage,
       config: {
         systemInstruction: SYSTEM_PROMPT,
