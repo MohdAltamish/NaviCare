@@ -139,7 +139,7 @@ ${category_filter ? `\nCategory filter: Focus on "${category_filter}" programs.`
 Please analyze which benefit programs this person may qualify for and which they likely do not.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-1.5-flash",
       contents: userMessage,
       config: {
         systemInstruction: SYSTEM_PROMPT,
