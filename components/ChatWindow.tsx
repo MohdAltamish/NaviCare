@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import ChatMessage from "@/components/ChatMessage";
 import QuestionCardComponent from "@/components/QuestionCard";
 import type { ChatMessage as ChatMessageType, TopicKey, UserSummary } from "@/lib/types";
@@ -132,11 +133,16 @@ export default function ChatWindow({ situation, onResultsReady }: ChatWindowProp
   return (
     <div className="chat-layout">
       {/* ─── Sidebar ─── */}
-      <aside className="chat-sidebar">
+      <motion.aside
+        className="chat-sidebar"
+        initial={{ x: -40, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+      >
         {/* Back to home */}
         <Link
           href="/"
-          className="flex items-center gap-2 text-sm font-medium mb-6 transition-colors"
+          className="flex items-center gap-2 text-sm font-medium mb-6 transition-colors nav-link-animated"
           style={{ color: "var(--nc-body)" }}
           onMouseEnter={(e) => {
             e.currentTarget.style.color = "var(--nc-green)";
@@ -162,12 +168,15 @@ export default function ChatWindow({ situation, onResultsReady }: ChatWindowProp
         </Link>
 
         {/* Situation summary */}
-        <div
+        <motion.div
           className="rounded-xl p-4 mb-6"
           style={{
             backgroundColor: "var(--nc-sage-light)",
             border: "1px solid var(--nc-sage-border)",
           }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
         >
           <p
             className="text-xs font-semibold uppercase tracking-wider mb-2"
@@ -196,7 +205,7 @@ export default function ChatWindow({ situation, onResultsReady }: ChatWindowProp
               {showSituation ? "Show less" : "Show more"}
             </button>
           )}
-        </div>
+        </motion.div>
 
         {/* Progress indicator */}
         <div className="mb-6">
@@ -213,14 +222,26 @@ export default function ChatWindow({ situation, onResultsReady }: ChatWindowProp
                 const isCovered = topicsCovered.includes(key);
                 return (
                   <div key={key} className="flex items-center gap-2.5">
-                    <div
-                      className="rounded-full shrink-0 transition-colors"
+                    <motion.div
+                      className="rounded-full shrink-0"
                       style={{
                         width: "8px",
                         height: "8px",
                         backgroundColor: isCovered
                           ? "var(--nc-green)"
                           : "var(--nc-card-border)",
+                      }}
+                      animate={
+                        isCovered
+                          ? {
+                              scale: [1, 1.3, 1],
+                              backgroundColor: "var(--nc-green)",
+                            }
+                          : {}
+                      }
+                      transition={{
+                        duration: 0.4,
+                        ease: [0.34, 1.56, 0.64, 1],
                       }}
                     />
                     <span
@@ -230,6 +251,7 @@ export default function ChatWindow({ situation, onResultsReady }: ChatWindowProp
                           ? "var(--nc-navy)"
                           : "var(--nc-muted)",
                         fontWeight: isCovered ? 500 : 400,
+                        transition: "color 0.3s, font-weight 0.3s",
                       }}
                     >
                       {TOPIC_LABELS[key]}
@@ -248,10 +270,19 @@ export default function ChatWindow({ situation, onResultsReady }: ChatWindowProp
           NaviCare uses your answers only to find matching programs. Nothing is
           stored after your session ends.
         </p>
-      </aside>
+      </motion.aside>
 
       {/* ─── Chat Area ─── */}
-      <div className="chat-main">
+      <motion.div
+        className="chat-main"
+        initial={{ x: 40, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{
+          duration: 0.5,
+          delay: 0.1,
+          ease: [0.25, 0.46, 0.45, 0.94],
+        }}
+      >
         {/* Messages */}
         <div className="chat-messages">
           {messages.map((msg) => (
@@ -268,9 +299,14 @@ export default function ChatWindow({ situation, onResultsReady }: ChatWindowProp
             </ChatMessage>
           ))}
 
-          {/* Loading indicator */}
+          {/* Loading indicator — bouncing dots */}
           {isLoading && (
-            <div className="flex items-start gap-3 mb-4">
+            <motion.div
+              className="flex items-start gap-3 mb-4"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.2 }}
+            >
               <div
                 className="shrink-0 flex items-center justify-center rounded-full text-white text-xs font-bold"
                 style={{
@@ -290,11 +326,11 @@ export default function ChatWindow({ situation, onResultsReady }: ChatWindowProp
               >
                 <div className="flex items-center gap-1.5">
                   <span className="typing-dot" />
-                  <span className="typing-dot" style={{ animationDelay: "0.2s" }} />
-                  <span className="typing-dot" style={{ animationDelay: "0.4s" }} />
+                  <span className="typing-dot" style={{ animationDelay: "0.15s" }} />
+                  <span className="typing-dot" style={{ animationDelay: "0.3s" }} />
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
           <div ref={messagesEndRef} />
@@ -316,9 +352,11 @@ export default function ChatWindow({ situation, onResultsReady }: ChatWindowProp
               backgroundColor: "#FFFFFF",
               border: "1px solid var(--nc-card-border)",
               color: "var(--nc-navy)",
+              opacity: isLoading ? 0.7 : 1,
+              transition: "opacity 0.2s, border-color 0.2s, box-shadow 0.2s",
             }}
           />
-          <button
+          <motion.button
             type="submit"
             disabled={isLoading || !inputValue.trim()}
             className="shrink-0 flex items-center justify-center rounded-full text-white cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -327,31 +365,54 @@ export default function ChatWindow({ situation, onResultsReady }: ChatWindowProp
               height: "44px",
               backgroundColor: "var(--nc-green)",
             }}
-            onMouseEnter={(e) => {
-              if (!isLoading)
-                e.currentTarget.style.backgroundColor = "var(--nc-green-hover)";
-            }}
-            onMouseLeave={(e) => {
-              if (!isLoading)
-                e.currentTarget.style.backgroundColor = "var(--nc-green)";
-            }}
+            whileHover={
+              !isLoading && inputValue.trim()
+                ? { scale: 1.05, backgroundColor: "#14532D" }
+                : {}
+            }
+            whileTap={!isLoading ? { scale: 0.95 } : {}}
           >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="22" y1="2" x2="11" y2="13" />
-              <polygon points="22 2 15 22 11 13 2 9 22 2" />
-            </svg>
-          </button>
+            {isLoading ? (
+              <svg
+                className="nc-spinner"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  opacity="0.3"
+                />
+                <path
+                  d="M12 2a10 10 0 019.95 9"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            ) : (
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
+            )}
+          </motion.button>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 }

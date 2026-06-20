@@ -68,6 +68,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Custom cursor — hide native on desktop */
+@media (min-width: 768px) {
+  body,
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  [role="button"] {
+    cursor: none !important;
+  }
+}
+
 /* ─── Typography ─── */
 h1, h2, h3, h4, h5, h6 {
   color: var(--nc-navy);
@@ -109,9 +122,9 @@ input, textarea, button, select, a {
 textarea:focus,
 input:focus,
 select:focus {
-  outline: 2px solid var(--nc-green);
-  outline-offset: 2px;
-  border-color: var(--nc-green);
+  outline: none;
+  border-color: var(--nc-green) !important;
+  box-shadow: 0 0 0 3px rgba(22,101,52,0.12);
 }
 
 /* ─── Animations ─── */
@@ -152,6 +165,42 @@ select:focus {
   40% { transform: scale(1); opacity: 1; }
 }
 
+@keyframes typing-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes orb-drift {
+  from { transform: translateX(-50%) translateY(0); }
+  to   { transform: translateX(-50%) translateY(30px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(22,101,52,0.4); }
+  70% { box-shadow: 0 0 0 12px rgba(22,101,52,0); }
+  100% { box-shadow: 0 0 0 0 rgba(22,101,52,0); }
+}
+
+@keyframes cursor-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes badge-pulse-green {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(22,101,52,0); }
+  50% { box-shadow: 0 0 0 6px rgba(22,101,52,0.15); }
+}
+
+@keyframes badge-pulse-amber {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(180,83,9,0); }
+  50% { box-shadow: 0 0 0 6px rgba(180,83,9,0.15); }
+}
+
 .animate-fade-in-up {
   animation: fadeInUp 0.5s ease-out forwards;
   opacity: 0;
@@ -189,7 +238,7 @@ select:focus {
   height: 8px;
   border-radius: 50%;
   background-color: var(--nc-muted);
-  animation: bounce 1.4s infinite ease-in-out both;
+  animation: typing-bounce 1.4s infinite ease-in-out;
 }
 
 /* ─── Eyebrow Labels ─── */
@@ -213,6 +262,114 @@ select:focus {
   margin-right: auto;
   padding-left: 24px;
   padding-right: 24px;
+}
+
+/* ─── Hero Visual Effects ─── */
+.hero-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+.hero-orb {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(22,101,52,0.06) 0%, transparent 70%);
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  animation: orb-drift 8s ease-in-out infinite alternate;
+}
+
+/* ─── Skeleton shimmer ─── */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 12px;
+}
+
+/* ─── CTA Pulse Ring ─── */
+.cta-pulse {
+  animation: pulse-ring 2s ease-in-out infinite;
+}
+
+/* ─── Benefit Card Hover Glow ─── */
+.benefit-card-hover {
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1),
+              box-shadow 0.25s ease,
+              border-color 0.25s ease;
+  will-change: transform;
+}
+
+.benefit-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 0 0 1px #166534,
+    0 20px 40px rgba(22,101,52,0.08);
+}
+
+/* ─── Button fill-from-left effect ─── */
+.btn-fill-left {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.btn-fill-left::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--nc-green);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: -1;
+}
+
+.btn-fill-left:hover::before {
+  transform: scaleX(1);
+}
+
+.btn-fill-left:hover {
+  color: #FFFFFF !important;
+  border-color: var(--nc-green) !important;
+}
+
+/* ─── Nav link underline animation ─── */
+.nav-link-animated {
+  position: relative;
+}
+
+.nav-link-animated::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--nc-green);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.nav-link-animated:hover::after {
+  transform: scaleX(1);
+}
+
+.nav-link-animated:not(:hover)::after {
+  transform-origin: right;
 }
 
 /* ─── Chat Layout ─── */
@@ -425,4 +582,19 @@ table td {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--nc-muted);
+}
+
+/* ─── Prefers Reduced Motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─── Will-change optimizations ─── */
+.will-change-transform {
+  will-change: transform;
 }

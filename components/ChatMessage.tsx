@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 
 interface ChatMessageProps {
   role: "user" | "assistant";
@@ -11,7 +12,16 @@ interface ChatMessageProps {
 export default function ChatMessage({ role, content, children }: ChatMessageProps) {
   if (role === "user") {
     return (
-      <div className="flex justify-end mb-4 animate-fade-in-up">
+      <motion.div
+        className="flex justify-end mb-4"
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{
+          duration: 0.25,
+          ease: [0.34, 1.56, 0.64, 1],
+        }}
+        style={{ transformOrigin: "bottom right" }}
+      >
         <div
           className="rounded-xl px-4 py-3 max-w-[80%]"
           style={{
@@ -21,12 +31,21 @@ export default function ChatMessage({ role, content, children }: ChatMessageProp
         >
           <p className="text-sm leading-relaxed">{content}</p>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="flex items-start gap-3 mb-4 animate-fade-in-up">
+    <motion.div
+      className="flex items-start gap-3 mb-4"
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{
+        duration: 0.35,
+        ease: [0.34, 1.56, 0.64, 1],
+      }}
+      style={{ transformOrigin: "bottom left" }}
+    >
       {/* Avatar */}
       <div
         className="shrink-0 flex items-center justify-center rounded-full text-white text-xs font-bold"
@@ -57,8 +76,21 @@ export default function ChatMessage({ role, content, children }: ChatMessageProp
         </div>
 
         {/* Question card (rendered below the message bubble) */}
-        {children && <div className="mt-3">{children}</div>}
+        {children && (
+          <motion.div
+            className="mt-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.4,
+              delay: 0.3,
+              ease: [0.25, 0.46, 0.45, 0.94],
+            }}
+          >
+            {children}
+          </motion.div>
+        )}
       </div>
-    </div>
+    </motion.div>
   );
 }

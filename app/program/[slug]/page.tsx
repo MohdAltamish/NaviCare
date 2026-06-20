@@ -3,6 +3,7 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import StepGuide from "@/components/StepGuide";
 import DocumentChecklist from "@/components/DocumentChecklist";
@@ -23,23 +24,31 @@ export default function ProgramDetailPage() {
           className="nc-container flex flex-col items-center justify-center text-center"
           style={{ minHeight: "60vh", paddingTop: "80px" }}
         >
-          <h2 className="mb-4">Program not found</h2>
-          <p className="text-base mb-6" style={{ color: "var(--nc-body)" }}>
-            The program &ldquo;{slug}&rdquo; doesn&apos;t exist in our database.
-          </p>
-          <Link
-            href="/browse"
-            className="inline-flex items-center rounded-lg px-6 py-3 text-sm font-semibold text-white"
-            style={{ backgroundColor: "var(--nc-green)" }}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
           >
-            Browse All Programs →
-          </Link>
+            <h2 className="mb-4">Program not found</h2>
+            <p className="text-base mb-6" style={{ color: "var(--nc-body)" }}>
+              The program &ldquo;{slug}&rdquo; doesn&apos;t exist in our database.
+            </p>
+            <Link
+              href="/browse"
+              className="inline-flex items-center rounded-lg px-6 py-3 text-sm font-semibold text-white"
+              style={{ backgroundColor: "var(--nc-green)" }}
+            >
+              Browse All Programs →
+            </Link>
+          </motion.div>
         </main>
       </>
     );
   }
 
   const cat = categoryColors[program.category as BenefitCategory];
+
+  // Split headline into words
+  const headlineWords = `${program.name} — ${program.full_name}`.split(" ");
 
   return (
     <>
@@ -48,10 +57,15 @@ export default function ProgramDetailPage() {
       <main style={{ paddingTop: "40px", paddingBottom: "80px" }}>
         <div className="nc-container" style={{ maxWidth: "1100px" }}>
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm mb-6 flex-wrap">
+          <motion.nav
+            className="flex items-center gap-2 text-sm mb-6 flex-wrap"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
             <Link
               href="/"
-              className="transition-colors"
+              className="nav-link-animated transition-colors"
               style={{ color: "var(--nc-muted)" }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = "var(--nc-green)";
@@ -65,7 +79,7 @@ export default function ProgramDetailPage() {
             <span style={{ color: "var(--nc-muted)" }}>›</span>
             <Link
               href={`/browse?category=${program.category}`}
-              className="transition-colors"
+              className="nav-link-animated transition-colors"
               style={{ color: "var(--nc-muted)" }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = "var(--nc-green)";
@@ -80,7 +94,7 @@ export default function ProgramDetailPage() {
             <span style={{ color: "var(--nc-navy)" }} className="font-medium">
               {program.name}
             </span>
-          </nav>
+          </motion.nav>
 
           <div className="program-detail-layout">
             {/* ═══ Left Content ═══ */}
@@ -88,75 +102,99 @@ export default function ProgramDetailPage() {
               {/* ─── Section 1: Header ─── */}
               <section className="mb-8">
                 {/* Category badge */}
-                <span
+                <motion.span
                   className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium mb-3"
                   style={{
                     backgroundColor: `${cat?.border}10`,
                     color: cat?.border,
                   }}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
                 >
                   {cat?.emoji} {cat?.label}
-                </span>
+                </motion.span>
 
+                {/* H1 — word by word stagger */}
                 <h1
                   className="mb-2"
                   style={{ fontSize: "32px", lineHeight: "1.2" }}
                 >
-                  {program.name} — {program.full_name}
-                </h1>
-
-                <p
-                  className="text-base leading-relaxed mb-4"
-                  style={{ color: "var(--nc-body)" }}
-                >
-                  {program.summary}
-                </p>
-
-                {/* Key stats */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {program.application.expedited_available && (
-                    <span
-                      className="inline-flex items-center rounded-full px-3 py-1 text-xs"
-                      style={{
-                        backgroundColor: "var(--nc-sage-light)",
-                        color: "var(--nc-green)",
-                        border: "1px solid var(--nc-sage-border)",
+                  {headlineWords.map((word, i) => (
+                    <motion.span
+                      key={i}
+                      className="inline-block mr-[0.3em]"
+                      initial={{ opacity: 0, y: 40 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.6,
+                        delay: 0.1 + i * 0.05,
+                        ease: [0.25, 0.46, 0.45, 0.94],
                       }}
                     >
-                      ⏱ {program.application.expedited_timeline || "Expedited available"}
-                    </span>
-                  )}
-                  <span
-                    className="inline-flex items-center rounded-full px-3 py-1 text-xs"
-                    style={{
-                      backgroundColor: "var(--nc-sage-light)",
-                      color: "var(--nc-green)",
-                      border: "1px solid var(--nc-sage-border)",
-                    }}
-                  >
-                    📅 Decision: {program.application.decision_timeline}
-                  </span>
-                  <span
-                    className="inline-flex items-center rounded-full px-3 py-1 text-xs"
-                    style={{
-                      backgroundColor: "var(--nc-sage-light)",
-                      color: "var(--nc-green)",
-                      border: "1px solid var(--nc-sage-border)",
-                    }}
-                  >
-                    🇺🇸{" "}
-                    {program.federal_or_state === "federal"
-                      ? "Federal program"
-                      : program.federal_or_state === "state"
-                      ? "State program"
-                      : "Available in all states"}
-                  </span>
+                      {word}
+                    </motion.span>
+                  ))}
+                </h1>
+
+                <motion.p
+                  className="text-base leading-relaxed mb-4"
+                  style={{ color: "var(--nc-body)" }}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.5 }}
+                >
+                  {program.summary}
+                </motion.p>
+
+                {/* Key stats chips — stagger */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {[
+                    program.application.expedited_available && {
+                      text: `⏱ ${program.application.expedited_timeline || "Expedited available"}`,
+                    },
+                    {
+                      text: `📅 Decision: ${program.application.decision_timeline}`,
+                    },
+                    {
+                      text: `🇺🇸 ${
+                        program.federal_or_state === "federal"
+                          ? "Federal program"
+                          : program.federal_or_state === "state"
+                          ? "State program"
+                          : "Available in all states"
+                      }`,
+                    },
+                  ]
+                    .filter((chip): chip is { text: string } => !!chip)
+                    .map((chip, i) => (
+                      <motion.span
+                        key={i}
+                        className="inline-flex items-center rounded-full px-3 py-1 text-xs"
+                        style={{
+                          backgroundColor: "var(--nc-sage-light)",
+                          color: "var(--nc-green)",
+                          border: "1px solid var(--nc-sage-border)",
+                        }}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          delay: 0.5 + i * 0.08,
+                          duration: 0.3,
+                        }}
+                      >
+                        {chip.text}
+                      </motion.span>
+                    ))}
                 </div>
 
                 {/* Disclaimer */}
-                <p
+                <motion.p
                   className="text-xs leading-relaxed"
                   style={{ color: "var(--nc-muted)" }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.7 }}
                 >
                   NaviCare summarizes public program information. Rules may vary
                   by state and change over time. Always verify at the{" "}
@@ -169,11 +207,17 @@ export default function ProgramDetailPage() {
                     official source
                   </a>
                   . Last updated: {program.last_updated}
-                </p>
+                </motion.p>
               </section>
 
               {/* ─── Section 2: Eligibility ─── */}
-              <section className="mb-8">
+              <motion.section
+                className="mb-8"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.5 }}
+              >
                 <h2 className="mb-4">Who qualifies for {program.name}?</h2>
 
                 {/* Income limits table */}
@@ -261,13 +305,17 @@ export default function ProgramDetailPage() {
                 {program.eligibility.special_notes.length > 0 && (
                   <div className="space-y-3">
                     {program.eligibility.special_notes.map((note, i) => (
-                      <div
+                      <motion.div
                         key={i}
                         className="flex items-start gap-2.5 rounded-lg p-3"
                         style={{
                           backgroundColor: "var(--nc-sage-light)",
                           border: "1px solid var(--nc-sage-border)",
                         }}
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: i * 0.05, duration: 0.3 }}
                       >
                         <span
                           className="shrink-0 mt-0.5"
@@ -281,14 +329,20 @@ export default function ProgramDetailPage() {
                         >
                           {note}
                         </p>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
                 )}
-              </section>
+              </motion.section>
 
               {/* ─── Section 3: What You'll Receive ─── */}
-              <section className="mb-8">
+              <motion.section
+                className="mb-8"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
                 <h2 className="mb-4">What {program.name} provides</h2>
                 <div
                   className="rounded-xl p-5"
@@ -326,15 +380,21 @@ export default function ProgramDetailPage() {
                     </div>
                   </div>
                 </div>
-              </section>
+              </motion.section>
 
               {/* ─── Section 4: Step-by-Step Guide ─── */}
-              <section className="mb-8">
+              <motion.section
+                className="mb-8"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
                 <h2 className="mb-4">
                   How to apply for {program.name} — step by step
                 </h2>
                 <StepGuide steps={program.steps} />
-              </section>
+              </motion.section>
 
               {/* ─── Section 5: Documents ─── */}
               <section className="mb-8">
@@ -346,7 +406,13 @@ export default function ProgramDetailPage() {
 
               {/* ─── Section 6: FAQs ─── */}
               {program.faqs.length > 0 && (
-                <section className="mb-8">
+                <motion.section
+                  className="mb-8"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                >
                   <h2 className="mb-4">Frequently asked questions</h2>
                   <div className="space-y-2">
                     {program.faqs.map((faq, index) => (
@@ -373,76 +439,82 @@ export default function ProgramDetailPage() {
                           >
                             {faq.question}
                           </span>
-                          <span
-                            className="shrink-0 text-sm transition-transform"
-                            style={{
-                              color: "var(--nc-muted)",
-                              transform:
-                                expandedFaq === index
-                                  ? "rotate(180deg)"
-                                  : "rotate(0deg)",
+                          <motion.span
+                            className="shrink-0 text-sm"
+                            style={{ color: "var(--nc-muted)" }}
+                            animate={{
+                              rotate: expandedFaq === index ? 180 : 0,
                             }}
+                            transition={{ duration: 0.25 }}
                           >
                             ▼
-                          </span>
+                          </motion.span>
                         </button>
-                        {expandedFaq === index && (
-                          <div
-                            className="px-5 pb-4 animate-slide-down"
-                            style={{
-                              borderTop: "1px solid var(--nc-card-border)",
-                            }}
-                          >
-                            <p
-                              className="text-sm leading-relaxed pt-3"
-                              style={{ color: "var(--nc-body)" }}
+                        <AnimatePresence>
+                          {expandedFaq === index && (
+                            <motion.div
+                              className="px-5 pb-4"
+                              style={{
+                                borderTop: "1px solid var(--nc-card-border)",
+                              }}
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.25 }}
                             >
-                              {faq.answer}
-                            </p>
-                          </div>
-                        )}
+                              <p
+                                className="text-sm leading-relaxed pt-3"
+                                style={{ color: "var(--nc-body)" }}
+                              >
+                                {faq.answer}
+                              </p>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     ))}
                   </div>
-                </section>
+                </motion.section>
               )}
 
               {/* ─── Compatible Programs ─── */}
               {program.can_combine_with.length > 0 && (
-                <section className="mb-8">
+                <motion.section
+                  className="mb-8"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                >
                   <h2 className="mb-4">Programs you can combine with {program.name}</h2>
                   <div className="flex flex-wrap gap-2">
-                    {program.can_combine_with.map((slug) => (
-                      <Link
-                        key={slug}
-                        href={`/program/${slug}`}
-                        className="rounded-full px-4 py-2 text-sm font-medium transition-colors"
-                        style={{
-                          backgroundColor: "var(--nc-sage-light)",
-                          color: "var(--nc-green)",
-                          border: "1px solid var(--nc-sage-border)",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            "var(--nc-green)";
-                          e.currentTarget.style.color = "#FFFFFF";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            "var(--nc-sage-light)";
-                          e.currentTarget.style.color = "var(--nc-green)";
-                        }}
-                      >
-                        {slug.toUpperCase().replace(/-/g, " ")}
-                      </Link>
+                    {program.can_combine_with.map((s) => (
+                      <motion.div key={s} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                        <Link
+                          href={`/program/${s}`}
+                          className="rounded-full px-4 py-2 text-sm font-medium transition-colors inline-block btn-fill-left"
+                          style={{
+                            backgroundColor: "var(--nc-sage-light)",
+                            color: "var(--nc-green)",
+                            border: "1px solid var(--nc-sage-border)",
+                          }}
+                        >
+                          {s.toUpperCase().replace(/-/g, " ")}
+                        </Link>
+                      </motion.div>
                     ))}
                   </div>
-                </section>
+                </motion.section>
               )}
             </div>
 
             {/* ═══ Right Sidebar ═══ */}
-            <aside className="program-detail-sidebar">
+            <motion.aside
+              className="program-detail-sidebar"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
               {/* Quick Facts Card */}
               <div
                 className="rounded-xl p-5 mb-4 sticky-sidebar-card"
@@ -505,23 +577,21 @@ export default function ProgramDetailPage() {
                   ))}
                 </div>
 
-                {/* Apply button */}
-                <a
+                {/* Apply button with pulsing ring */}
+                <motion.a
                   href={program.application.apply_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-5 w-full flex items-center justify-center rounded-lg px-4 py-3 text-sm font-semibold text-white transition-colors"
+                  className="cta-pulse mt-5 w-full flex items-center justify-center rounded-lg px-4 py-3 text-sm font-semibold text-white"
                   style={{ backgroundColor: "var(--nc-green)" }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor =
-                      "var(--nc-green-hover)";
+                  whileHover={{
+                    backgroundColor: "#14532D",
+                    scale: 1.02,
                   }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "var(--nc-green)";
-                  }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   Apply for {program.name} →
-                </a>
+                </motion.a>
 
                 <div
                   className="mt-4 pt-4"
@@ -535,18 +605,10 @@ export default function ProgramDetailPage() {
                   </p>
                   <Link
                     href={`/chat?situation=I want to know if I qualify for ${program.name}`}
-                    className="w-full flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors"
+                    className="btn-fill-left w-full flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors"
                     style={{
                       border: "1px solid var(--nc-green)",
                       color: "var(--nc-green)",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "var(--nc-green)";
-                      e.currentTarget.style.color = "#FFFFFF";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "var(--nc-green)";
                     }}
                   >
                     Ask NaviCare →
@@ -555,12 +617,15 @@ export default function ProgramDetailPage() {
               </div>
 
               {/* Caseworker Card */}
-              <div
+              <motion.div
                 className="rounded-xl p-5"
                 style={{
                   backgroundColor: "var(--nc-sage-light)",
                   border: "1px solid var(--nc-sage-border)",
                 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.4 }}
               >
                 <h3
                   className="text-base font-bold mb-1"
@@ -575,24 +640,22 @@ export default function ProgramDetailPage() {
                   A local caseworker can help you apply for free — and can tell
                   you if you qualify before you submit.
                 </p>
-                <a
+                <motion.a
                   href="https://www.findhelp.org"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition-colors"
+                  className="w-full flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-white"
                   style={{ backgroundColor: "var(--nc-green)" }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor =
-                      "var(--nc-green-hover)";
+                  whileHover={{
+                    backgroundColor: "#14532D",
+                    scale: 1.02,
                   }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "var(--nc-green)";
-                  }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   Find a Caseworker →
-                </a>
-              </div>
-            </aside>
+                </motion.a>
+              </motion.div>
+            </motion.aside>
           </div>
         </div>
       </main>

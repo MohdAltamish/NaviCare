@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 import { type QuestionCard as QuestionCardType } from "@/lib/types";
 import { US_STATES } from "@/lib/types";
 import NumberStepper from "@/components/NumberStepper";
@@ -10,6 +11,19 @@ interface QuestionCardProps {
   onAnswer: (answer: string) => void;
   disabled?: boolean;
 }
+
+const pillVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.3,
+      delay: i * 0.05,
+      ease: [0.25, 0.46, 0.45, 0.94] as const,
+    },
+  }),
+};
 
 export default function QuestionCard({
   question,
@@ -55,13 +69,16 @@ export default function QuestionCard({
   };
 
   return (
-    <div
-      className="rounded-xl p-4 animate-fade-in-up"
+    <motion.div
+      className="rounded-xl p-4"
       style={{
         backgroundColor: "#FFFFFF",
         border: "1px solid var(--nc-card-border)",
         borderLeft: "4px solid var(--nc-green)",
       }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
     >
       {/* Question text */}
       <p
@@ -74,32 +91,26 @@ export default function QuestionCard({
       {/* ─── Yes/No ─── */}
       {question.type === "yesno" && (
         <div className="flex gap-3">
-          {["Yes", "No"].map((opt) => (
-            <button
+          {["Yes", "No"].map((opt, i) => (
+            <motion.button
               key={opt}
+              custom={i}
+              variants={pillVariants}
+              initial="hidden"
+              animate="visible"
               onClick={() => handleYesNo(opt)}
               disabled={disabled}
-              className="flex-1 rounded-lg py-3 text-sm font-semibold cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 rounded-lg py-3 text-sm font-semibold cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed btn-fill-left"
               style={{
                 backgroundColor: "var(--nc-sage-light)",
                 border: "1px solid var(--nc-sage-border)",
                 color: "var(--nc-green)",
               }}
-              onMouseEnter={(e) => {
-                if (!disabled) {
-                  e.currentTarget.style.backgroundColor = "var(--nc-green)";
-                  e.currentTarget.style.color = "#FFFFFF";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!disabled) {
-                  e.currentTarget.style.backgroundColor = "var(--nc-sage-light)";
-                  e.currentTarget.style.color = "var(--nc-green)";
-                }
-              }}
+              whileHover={!disabled ? { scale: 1.02 } : {}}
+              whileTap={!disabled ? { scale: 0.98 } : {}}
             >
               {opt}
-            </button>
+            </motion.button>
           ))}
         </div>
       )}
@@ -107,32 +118,26 @@ export default function QuestionCard({
       {/* ─── Pills (single select) ─── */}
       {question.type === "pills" && question.options && (
         <div className="flex flex-wrap gap-2">
-          {question.options.map((opt) => (
-            <button
+          {question.options.map((opt, i) => (
+            <motion.button
               key={opt}
+              custom={i}
+              variants={pillVariants}
+              initial="hidden"
+              animate="visible"
               onClick={() => handlePillClick(opt)}
               disabled={disabled}
-              className="rounded-full px-4 py-2 text-sm font-medium cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-full px-4 py-2 text-sm font-medium cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed btn-fill-left"
               style={{
                 backgroundColor: "var(--nc-sage-light)",
                 border: "1px solid var(--nc-sage-border)",
                 color: "var(--nc-green)",
               }}
-              onMouseEnter={(e) => {
-                if (!disabled) {
-                  e.currentTarget.style.backgroundColor = "var(--nc-green)";
-                  e.currentTarget.style.color = "#FFFFFF";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!disabled) {
-                  e.currentTarget.style.backgroundColor = "var(--nc-sage-light)";
-                  e.currentTarget.style.color = "var(--nc-green)";
-                }
-              }}
+              whileHover={!disabled ? { scale: 1.03 } : {}}
+              whileTap={!disabled ? { scale: 0.97 } : {}}
             >
               {opt}
-            </button>
+            </motion.button>
           ))}
         </div>
       )}
@@ -141,11 +146,15 @@ export default function QuestionCard({
       {question.type === "multiselect" && question.options && (
         <div>
           <div className="flex flex-wrap gap-2 mb-3">
-            {question.options.map((opt) => {
+            {question.options.map((opt, i) => {
               const isSelected = selectedMulti.includes(opt);
               return (
-                <button
+                <motion.button
                   key={opt}
+                  custom={i}
+                  variants={pillVariants}
+                  initial="hidden"
+                  animate="visible"
                   onClick={() => handleMultiToggle(opt)}
                   disabled={disabled}
                   className="rounded-full px-4 py-2 text-sm font-medium cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
@@ -158,21 +167,33 @@ export default function QuestionCard({
                     }`,
                     color: isSelected ? "#FFFFFF" : "var(--nc-green)",
                   }}
+                  whileHover={!disabled ? { scale: 1.03 } : {}}
+                  whileTap={!disabled ? { scale: 0.97 } : {}}
                 >
-                  {isSelected ? "✓ " : ""}
+                  {isSelected && (
+                    <motion.span
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      ✓{" "}
+                    </motion.span>
+                  )}
                   {opt}
-                </button>
+                </motion.button>
               );
             })}
           </div>
-          <button
+          <motion.button
             onClick={handleMultiSubmit}
             disabled={disabled || selectedMulti.length === 0}
             className="rounded-lg px-5 py-2 text-sm font-semibold text-white cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ backgroundColor: "var(--nc-green)" }}
+            whileHover={{ scale: 1.02, backgroundColor: "#14532D" }}
+            whileTap={{ scale: 0.98 }}
           >
             Continue →
-          </button>
+          </motion.button>
         </div>
       )}
 
@@ -185,14 +206,16 @@ export default function QuestionCard({
             max={10}
             onChange={setNumberValue}
           />
-          <button
+          <motion.button
             onClick={handleNumberConfirm}
             disabled={disabled}
             className="rounded-lg px-5 py-2 text-sm font-semibold text-white cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ backgroundColor: "var(--nc-green)" }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
             Confirm
-          </button>
+          </motion.button>
         </div>
       )}
 
@@ -226,14 +249,16 @@ export default function QuestionCard({
                   </option>
                 ))}
           </select>
-          <button
+          <motion.button
             onClick={handleDropdownConfirm}
             disabled={disabled || !dropdownValue}
             className="rounded-lg px-5 py-2 text-sm font-semibold text-white cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ backgroundColor: "var(--nc-green)" }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
             Confirm
-          </button>
+          </motion.button>
         </div>
       )}
 
@@ -246,6 +271,6 @@ export default function QuestionCard({
           Type your answer in the chat input below ↓
         </p>
       )}
-    </div>
+    </motion.div>
   );
 }
