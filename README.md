@@ -94,13 +94,13 @@ Every program has a comprehensive detail page with eligibility tables, step-by-s
 ## 📸 Screenshots
 
 ### Landing Page
-![NaviCare Landing Page — Hero section with situation input, category grid, and trust badges](../Screenshots/screencapture-localhost-3000-2026-06-21-02_13_19.png)
+![NaviCare Landing Page — Hero section with situation input, category grid, and trust badges](screenshots/landing-page.png)
 
 ### AI Chat Interface
-![NaviCare AI Chat — Conversational eligibility assessment with sidebar tracking and program results](../Screenshots/screencapture-localhost-3000-chat-2026-06-21-01_58_10.png)
+![NaviCare AI Chat — Conversational eligibility assessment with sidebar tracking and program results](screenshots/chat-page.png)
 
 ### Program Detail Page
-![NaviCare Program Detail — SNAP eligibility table, step-by-step guide, document checklist, and FAQs](../Screenshots/screencapture-localhost-3000-program-snap-2026-06-21-02_08_17.png)
+![NaviCare Program Detail — SNAP eligibility table, step-by-step guide, document checklist, and FAQs](screenshots/program-detail.png)
 
 ---
 
